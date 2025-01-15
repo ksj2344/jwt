@@ -8,12 +8,13 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
+import java.security.SecureRandom;
 import java.util.Date;
 
 @Slf4j
@@ -31,7 +32,7 @@ public class JwtTokenProvider {
     }
 
     public String generateAccessToken(JwtUser jwtUser) {
-        return generateToken(jwtUser,jwtConst.getAccessTokenExpiry())
+        return generateToken(jwtUser,jwtConst.getAccessTokenExpiry());
     }
 
     public String generateRefreshToken(JwtUser jwtUser) {
@@ -86,7 +87,8 @@ public class JwtTokenProvider {
         }
     }
 
-    //Spring Security(securityContext)에서 autentication을 담음. autentication은 principal을 담고 principal은 userDetails를 담음
+    //Spring Security(securityContext)에서 autentication을 담음. autentication은 principal을 담고 principal은 userDetails와 같음
+    //autentication: principal+Authorities
     //이걸 통해 인증함
     public Authentication getAuthentication(String token) {
         JwtUser jwtUser = getJwtUserFromToken(token);

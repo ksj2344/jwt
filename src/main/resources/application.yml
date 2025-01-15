@@ -1,3 +1,6 @@
+file:
+  directory: D:/ksj/download/greengram_ver3
+
 jwt-const:
   issuer: green@green.kr #토큰 발행자
   secret: DaeguGreenComputerAcademysmdfajlsfjlaskfjlaskdienvoinxovkaodlvikasjofiajsoidkjrfoeaiwjfo
@@ -6,9 +9,9 @@ jwt-const:
   token-name: JWT
   token-type: Bearer
   access-token-expiry: 600_000 #10minuit (ms)
-  refresh-token-expiry: 1_296_000_000 #15day (ms)
+  refresh-token-expiry: 1_296_000_000 #15days (ms)
   refresh-token-cookie-name: refresh-token
-  refresh-token-cookie-expiry: 1_296_000 #15day (s)
+  refresh-token-cookie-expiry: 1_296_000 #15days (s)
 
 mybatis:
   mapper-locations: mappers/**/*.xml
@@ -16,7 +19,7 @@ mybatis:
 spring:
   datasource:
     driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
-    url: jdbc:log4jdbc:mariadb://localhost/greengram_ver3
+    url: jdbc:log4jdbc:mariadb://localhost/jwt
     username: root
     password: green502
 
