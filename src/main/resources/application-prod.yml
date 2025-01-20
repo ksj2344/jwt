@@ -1,0 +1,10 @@
+
+
+constant:
+  jwt-const:
+    access-token-expiry: 600_000 #10minuit (ms)
+spring:
+  datasource:
+    url: jdbc:log4jdbc:mariadb://localhost/jwt
+    username: root
+    password: green502

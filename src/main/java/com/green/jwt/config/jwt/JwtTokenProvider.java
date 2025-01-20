@@ -2,19 +2,18 @@ package com.green.jwt.config.jwt;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.green.jwt.config.JwtConst;
+import com.green.jwt.config.constant.JwtConst;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.security.SecureRandom;
 import java.util.Date;
 
 @Slf4j
@@ -43,7 +42,7 @@ public class JwtTokenProvider {
         Date now = new Date();
         return Jwts.builder()
                     //header
-                .header().type(jwtConst.getTokenName())
+                .header().type(jwtConst.getBearerFormat())
                 .and()
                     //paload
                 .issuer(jwtConst.getIssuer()) //토큰 발행자
@@ -68,6 +67,16 @@ public class JwtTokenProvider {
 
 
     //---- 만들어진 토큰(AT,RT)에서 정보 뽑기
+    public String resolveToken(HttpServletRequest req) {
+        String bearerToken = req.getHeader(jwtConst.getHeaderKey());
+        if(bearerToken==null || !bearerToken.startsWith(jwtConst.getScheme())){
+            return null;
+        } //여길 지나쳐왔다면 토큰이 있고, Bearer로 문자열이 시작한다. 그러면 Bearer 내용을 제외한 토큰값만 리턴한다.
+
+        return bearerToken.substring(jwtConst.getScheme().length()+1); //Bearer(빈칸까지) index를 설정해야하기때문
+        //trim(): 양쪽에 빈공간이 있으면 없애줌
+        //return bearerToken.substring(jwtConst.getTokenType().length()).trim();
+    }
 
     private Claims getClaims(String token) { //payload부분 뽑기
         return Jwts.parser()
@@ -93,6 +102,7 @@ public class JwtTokenProvider {
     public Authentication getAuthentication(String token) {
         JwtUser jwtUser = getJwtUserFromToken(token);
         return new UsernamePasswordAuthenticationToken(jwtUser, null, jwtUser.getAuthorities());
+        //principal:jwtUser, Authorities: jwtUser.getAuthorities()
     }
 
 }

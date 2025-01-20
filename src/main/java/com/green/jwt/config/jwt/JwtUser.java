@@ -1,5 +1,6 @@
 package com.green.jwt.config.jwt;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -16,11 +17,10 @@ import java.util.function.Function;
 @Getter
 @EqualsAndHashCode //서로 같은 값을 가졌으면 true로 반환하는 오버라이딩 에노테이션(Equals, HashCode 메소드 오버라이딩)
 @RequiredArgsConstructor
-public class JwtUser implements UserDetails {
+public class JwtUser {
     private final long signedUserId;
     private final List<UserRole> roles; //인가(권한)처리 때 사용, ROLE_이름. ROLE_USER, ROLE_ADMIN 같은 식으로 작성
-
-    @Override
+    @JsonIgnore
     public Collection<? extends GrantedAuthority> getAuthorities() {
         //Collection<? extends GrantedAuthority>: 리턴타입은 Collection. 방 하나하나의 타입은 <>지정을 한다.
         // 그런데 <?>라면 그 콜렉션의 타입은 Object가 됨.
@@ -30,7 +30,8 @@ public class JwtUser implements UserDetails {
         // Authentication에 Authorities(타입 SimpleGrantedAuthority)가 포함됨. 여기서 Authorities는 권한.
 
 
-        return roles.stream().map(item->new SimpleGrantedAuthority(item.name())).toList();
+        return roles.stream()
+                .map(item->new SimpleGrantedAuthority(String.format("ROLE_%s",item.name()))).toList();
         //여기서 item.name은 UserRole의 ROLE_* 값
 
         //원래 아래 내용인데 가공이 필요해서 변경함
@@ -53,7 +54,7 @@ public class JwtUser implements UserDetails {
         /*
             함수형 프로그램(Function)을 쓰는 메서드
             map: 똑같은 크기의 다른 값을 만들고 싶을 때 씀
-            filter: 같은 내용인데 정보값을 뽑아서 더 작은 새로운 collection을 만들때
+            filter: 같은 내용인데 정보값을 뽑아서 더 작은 새로운 collection을 만들때 사용. 파라미터로는 boolean을 받음. 그래서 Predicate를 받는다.
         */
 
                 //여기서 map() 안의 코드가 하는 일은 Function을 implement하여 apply 메서드를 쓴 객체 주소값을 하나 반환 하는 것.
@@ -75,14 +76,4 @@ public class JwtUser implements UserDetails {
     //GreenSecurity 의 doFilterInternal 대신함
 
 
-    //security 로그인을 사용하면 아래 두 메서드를 쓰겠지만 우린 직접처리할 것임
-    @Override
-    public String getPassword() {
-        return null;
-    }
-
-    @Override
-    public String getUsername() {
-        return null;
-    }
 }
